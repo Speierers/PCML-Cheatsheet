@@ -815,7 +815,7 @@ with $\bm \beta$ the parameters of the model.
 \section{K-means}
 \begin{itemize}
 	\item \textbf{Unsupervised learning}: Represent particular input patterns in a way that reflects the statistical structure of the overall collections of input partterns.
-	\item \textbf{Cluster} are groups of points whose inter-point distances are small compared tothe distances outside the cluster.
+	\item \textbf{Cluster} are groups of points whose inter-point distances are small compared to the distances outside the cluster.
 	\begin{myalign*}
 	    \min_{\*r, \bm \mu} \L(\*r, \bm \mu) = \sum_{k = 1}^K \sum_{n = 1}^N r_{nk} ||\*x_n - \bm \mu_k||^2_2
 	\end{myalign*}
@@ -864,7 +864,7 @@ with $\bm \beta$ the parameters of the model.
 
 	\item \textbf{Soft-clustering}: Points can belong to several cluster by defining $r_n$ to be a random variable.
 	\begin{myalign*}
-		p(r_{nk} = 1) &= \pi_k \text{ where } \pi_k > 0, \forall k \\
+		p(r_{nk} = 1) &= \pi_k \text{ where } \pi_k > 0, \forall k \\ %LEARN
 		\sum_{k = 1}^K \pi_k &= 1
 	\end{myalign*}
 
@@ -902,7 +902,7 @@ with $\bm \beta$ the parameters of the model.
 
 % ========================================================
 
-\section{Expectation Maximization Algorithm}
+\section{Expectation Maximization Algorithm} %LEARN
 
 \begin{itemize}
 	\item \textit{[ALGORITHM]} Start with $\bm \theta^{(1)}$ and iterate
@@ -941,7 +941,7 @@ with $\bm \beta$ the parameters of the model.
 \section{Matrix factorization}
 \begin{itemize}
 	\item We have $D$ movies and $N$ users
-	\item $X$ is a matrix $D \times N$ with $x_{dn}$ the rating of n'th user for d'th movie.
+	\item $\*X$ is a matrix $D \times N$ with $x_{dn}$ the rating of n'th user for d'th movie.
 	\item We project data vectors $\*x_n$ to a smaller dimension $\*z_n \in \Bbb R^M$
 	\item We have now 2 latent variables:
 	\begin{itemize}
@@ -970,7 +970,7 @@ with $\bm \beta$ the parameters of the model.
 
 	 \item Since many ratings are missing we cannot normalize the data. A solution is to add offset terms:
 	 \begin{myalign*}
-	     \frac{1}{2} \sum_{n = 1}^N \sum_{d O_n} (x_{dn} - \*w_d^T \*z_n - w_{0d} - z_{0n} - \mu)^2
+	     \frac{1}{2} \sum_{n = 1}^N \sum_{d \in O_n} (x_{dn} - \*w_d^T \*z_n - w_{0d} - z_{0n} - \mu)^2
 	 \end{myalign*}
 \end{itemize}
 % ========================================================
@@ -992,6 +992,13 @@ with $\bm \beta$ the parameters of the model.
 	    \*X = \sum_{d = i}^D s_d \*u_d \*v_d^T
 	\end{myalign*}
 	This tells you about the spectrum of $\*X$ where higher singular vectors contain the \textit{low-frequency information} and lower singular values contain the \textit{high-frequency information}.
+    \item Let's now truncate these matrices
+    \begin{align*}
+        \*X &\approx \*U_{tr} \*S_{tr} \*V^*_{tr} \\
+        \*T_{tr} &\approx \*U_{tr} \*S_{tr} \\
+        \*T_{te} &\approx \*X_{te}\*V_{tr}
+    \end{align*}
+    with $\*T_{tr}$ the reduced feature set of $\*X$ and $\*T_{te}$ the reduced feature set of $\*X_{te}$
 \end{itemize}
 % ========================================================
 
@@ -1017,10 +1024,19 @@ such that columns of $\*W$ are orthogonal.
 
 % ========================================================
 
-% ========================================================
+\section{Belief Propagation}
+\begin{itemize}
+    \item the goal is to learn \textit{inference of the latent variables using belief propagation}
+    \item Given a directed acyclic graph $G$ and parameters $\theta$, a \textbf{Bayesian network} defines the joint distribution as follows
+    \begin{align*}
+        p_{\theta}(\*x) = \prod_{k = 1}^K p_{\theta}(x_k | \text{parents}_k)
+    \end{align*}
+    \item We can reduce the complexity by using the structure of the problem and the bayesian rule. %LEARN
+\end{itemize}
 
 % ========================================================
-\section{Multi-Layer Perceptron (MLP)}
+
+\section{Multi-Layer Perceptron (MLP)} %LEARN
 \begin{itemize}
     \item Known as \textbf{feed-forward neural network}
     \item $\*z_n^{(k)}$ is the k'th hidden vector
@@ -1052,12 +1068,20 @@ such that columns of $\*W$ are orthogonal.
 
 \section{Gaussian Process (GP)}
 \begin{itemize}
+    \item GP are a family of statistical distributions in which time plays a role and for which any finite linear combination of samples has a joint Gaussian distribution.
+    \item They can be completely defined by their second-order statistics which means that if they have mean zero, then defining the covariance function completely defines the process behaviour.
     \item Let us place a probabilistic prior shape on the approximation of a function.
     \item A GP process defines a prior over function f
     \begin{align*}
         p(\*f | X) = \N(\*f | \*0, K(X))
     \end{align*}
     \item $K(X)$ defines shape and prior knowledge about our problem
+    \begin{align*}
+        &p(\*f | \*y, \*X_*, \*X) \sim \N(\mu', \sigma')\\
+        & \mu' = K(\*X_*, \*X)[K(\*X,\*X) + \sigma_n^2 I]^{-1}\*y\\
+        & \*\sigma' = K(\*X_*, \*X_*) - K(\*X_*, \*X)[K(\*X, \*X) + \sigma_n^2 I] K(\*X, \*X_*)
+    \end{align*}
+    with $\sigma_n$ the variance of the noise
     \item RBF kernel
     \begin{align*}
          k(\*x_n, \*x_m) = e^{-|| \*x_n - \*x_m||^2 / L^2}
@@ -1069,17 +1093,40 @@ such that columns of $\*W$ are orthogonal.
 \end{itemize}
 % ========================================================
 
-\section{Decision Trees}
+\section{Decision Trees (DT)}
 \begin{itemize}
+    \item A decision tree is a structure in which each internal node represents a test on an attribute and each branch represents the outcome of the test and each leaf represents a class label.
     \item Fast to train and fast to make predictions
     \item Efficient for very high dimensional feature spaces and very large amounts of training data
-    \item Lack of smoothness and high variance
+    \item Lack of smoothness and high variance (overfitting)
     \item Goal: find a split (k, $\tau$) that minimizes an impurity measure at the leaves
-    \item 
+    \begin{itemize}
+        \item Find best feature to split on
+        \item Find best threshold
+    \end{itemize}
 \end{itemize}
 % ========================================================
 
-\section{Random Forests}
+\section{Random Forests (RF)}
+\begin{itemize}
+    \item RF correct the overfitting bad "habit" of DTs.
+    \item Training: Learn M trees on different subsets (random) of training data
+    \item Prediction: Average of prediction of each tree
+    \item Variance of the model averaging:
+    \begin{align*}
+        z_1 = f_1 \hspace{5pt} &\Rightarrow \hspace{5pt} z_M = \frac{1}{M} \sum_{i = 1}^M f_i \\
+        V(z_1) = \sigma^2 \hspace{5pt} &\Rightarrow \hspace{5pt} V(z_M) = \frac{1}{M} \sigma^2 + \rho \frac{M - 1}{M} \sigma^2
+    \end{align*}
+    \item Variance reduction ratio:
+    \begin{align*}
+        \frac{V(z_1)}{V(z_M)} = \frac{M}{1 +\rho (M - 1)}
+    \end{align*}
+    \item 2 techniques for decorrelating trees:
+    \begin{itemize}
+        \item \textbf{Bagging}: Randomize training data
+        \item Randomized feature selection
+    \end{itemize}
+\end{itemize}
 
 % ========================================================
 

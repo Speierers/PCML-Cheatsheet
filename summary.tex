@@ -1,0 +1,987 @@
+% ========================================================
+
+\section{Math Prerequisites}
+
+% ========================================================
+\begin{itemize}
+	\item Bayes rule
+	\[
+	     p(A, B) = \underbrace{p(A | B)}_{\text{Lik.}} \underbrace{p(B)}_{\text{Prior}} = \underbrace{p(B | A)}_{\text{Post}} \underbrace{p(A)}_{\text{Marg. Lik.}}
+	\]
+    \item Gaussian distribution
+    \begin{myalign*}
+        \N(x | \mu, \sigma^2) = \frac{1}{\sqrt{2 \pi \sigma^2}} \exp(- \frac{(x - \mu)^2}{2 \sigma^2})
+    \end{myalign*}
+    \begin{myalign*}
+        \N(\* x | \bm \mu, \bm \Sigma) = \frac{1}{\sqrt{2 \pi |\bm \Sigma|}} \exp(- \frac{1}{2} (\*x - \bm \mu)^T \bm \Sigma^{-1} (\*x - \bm \mu))
+    \end{myalign*}
+    \item Production of independent variables:
+    \begin{myalign*}
+        V(XY) = E(X^2)E(Y^2) - [E(X)]^2 [E(Y)]^2
+    \end{myalign*}
+    \item Log-properties
+    \begin{myalign*}
+        \log(m n) = \log(m) + \log(n)\\
+        \log(m^n) = n \log(m)
+    \end{myalign*}
+    \item Covariance matrix of a data vector $\*x$
+    \begin{myalign*}
+        \*\Sigma = \frac{1}{N} \sum_{n = 1}^N (\*x_n - E(\*x)(\*x_n - E(\*x)^T
+    \end{myalign*}
+\end{itemize}
+
+\subsection{Convexity}
+\begin{itemize}
+\item A function is convex when a line joining two points never interects with the function anywhere else.
+
+\item A function $f(x)$ is convex, if for any $x_1, x_2 \in \* X$ and for any $0 \leq \lambda \leq 1$, we have :
+$$ f(\lambda x_1 + (1 - \lambda) x_2) \leq \lambda f(x_1) + (1 - \lambda) f(x_2)$$
+
+\item A function is strictly convex if the inequality is strict.
+
+\item A convex function has only one global minimum.
+
+\item Sums of convex functions are also convex.
+
+\item The Hessian is related to the convexity of a function: a twice differentiable function is convex if and only if the Hessian is positive definite.
+\item The Hessian of a convex function is positive semi-definite and for a strictly-convex function it is positive definite.
+\item The Hessian matrix of a function
+\begin{align*}
+    \*H_{i,j} = \frac{d^2 f}{d x_i dx_j}
+\end{align*}
+\end{itemize}
+
+% ========================================================
+
+\subsection{Linear Algebra}
+\begin{itemize}
+\item Column $\*x \in R^n$, rows $\*x^T$, matrix $\*A \in R^{m \times n}$
+
+\item $\*x^T \*x$ is a scalar, $\*x \*x^T$ is a matrix
+
+\item $\*A^{-1}$ exist if $\*A$ is full rank
+
+\item \textbf{Condition number} of a function measures how much the output value can change for a small change in the input argument. A matrix with a high condition number is said to be \textbf{ill-conditioned}. If $\*A$ is normal ($A^T A = A A^T$) then
+\begin{myalign*}
+    k(\*A) = 
+    \left|
+    	\frac{\lambda_{max}(\*A)}{\lambda_{min}(\*A)}
+    \right|
+\end{myalign*}
+
+\item A positive definite matrix is \textbf{symmetric} with all positive eigenvalues
+\item The real symmetric $N \times N$ matrix $\*V$ is said to be \textbf{positive semidefinite} if 
+\begin{myalign*}
+    \*a^T \*V \*a \geq 0
+\end{myalign*}
+for any real $N \times 1$ vector $a$.
+\item The real symmetric $N \times N$ matrix $\*V$ is said to be \textbf{positive definite} if 
+\begin{myalign*}
+    \*a^T \*V \*a > 0
+\end{myalign*}
+for any real $N \times 1$ vector $a$.
+\item Cost of matrix inversion: $O(n^3) \rightarrow O(n^{2.372})$
+\item Cost of determinant computation using LU decomposition: $O(n^3)$
+
+\end{itemize}
+
+% ========================================================
+
+\section{Cost functions}
+\begin{itemize}
+    \item Cost functions are used to learn parameters that explain the data well.
+    \item It is essential to make sure that a global minimum exist $\rightarrow$ lower bounded
+\end{itemize}
+
+\textbf{Mean square error (MSE)}:
+\begin{myalign*}
+    MSE(\bm \beta ) = \sum^N_{n = 1} (y_n - f(\* x_n ))^2
+\end{myalign*}
+
+\begin{itemize}
+    \item MSE is \textbf{convex} thus it has only one global minumum value.
+    \item MSE is not good when outliers are present.
+\end{itemize}
+
+\textbf{Mean Absolute Error (MAE)}:
+\begin{myalign*}
+    MAE = \sum^N_{n = 1} |y_n - f(\* x_n)|
+\end{myalign*}
+
+\textbf{Huber loss}
+\begin{myalign*}
+    Huber = 
+    \left\{ 
+        \begin{array}{c c}
+            \frac{1}{2} z^2 &,|z| \leq \delta \\
+            \delta |z| - \frac{1}{2} \delta^2 & ,|z| > \delta
+        \end{array}
+    \right.
+\end{myalign*}
+\begin{itemize}
+\item Huber loss is convex, differentiable, and also robust to outliers
+\item hard to set $\delta$.\\
+\end{itemize}
+
+\textbf{Tukey's bisquare loss}
+\begin{myalign*}
+    L(z) =
+    \left\{ 
+        \begin{array}{c c}
+            z(\delta^2 - z^2)^2 &, |z| < \delta \\
+            0 &, |z| \geq \delta
+        \end{array}
+    \right.
+\end{myalign*}
+Tukey's loss is non-convex, non-differentiable, but robust to outliers.
+
+
+\textbf{Hinge loss}
+\begin{myalign*}
+    Hinge = [1 - y_n f(\* x_n)]_+
+\end{myalign*}
+
+\textbf{Logistic loss}
+\begin{myalign*}
+    Logistic =  \log(1 - \exp(y_n f(\* x_n)))
+\end{myalign*}
+
+
+% ========================================================
+
+\section{Regression}
+\begin{itemize}
+    \item \textbf{Data} consists of N pairs $(y_n, \*x_n)$
+    \begin{enumerate}
+        \item $y_n$ the n'th output
+        \item $\*x_n$ is a vector of D inputs
+    \end{enumerate}
+    \item \textbf{Prediction}: predict the ouput for a new input vector.
+
+    \item \textbf{Interpretation}: understand the effect of inputs on output.
+
+    \item \textbf{Outliers} are data that are far away from most of the other examples.
+\end{itemize}
+% ========================================================
+
+\subsection{Linear Regression}
+\begin{itemize}
+	\item Model that assume linear relationship between inputs and the ouput.
+\begin{myalign*}
+    y_n &\equiv f(\* x_n) \\
+    & := \beta_0 + \beta_1 x_{n1} + ... \\
+    & = \* x^T_n \bm \beta
+\end{myalign*}
+with $\bm \beta$ the parameters of the model.
+\item Variance grows only linearly with dimensionality
+\end{itemize}
+
+
+% ========================================================
+
+\subsection{Gradient Descent}
+\begin{itemize}
+	\item Gradient descent uses only first-order information and takes steps in the direction of the gradient
+	\item Given a cost function $\L(\bm \beta)$ we wish to find $\bm \beta$ that minimizes the cost: 
+	\begin{myalign*}
+	    \min_{\bm \beta} \L(\bm \beta)
+	\end{myalign*}
+\end{itemize}
+
+% ========================================================
+
+\subsubsection{Grid search}
+\begin{itemize}
+    \item Compute the cost over a grid of $M$ points to find the minimum
+    \item Exponential Complexity $O(N D M^D)$
+    \item Hard to find a good range of values
+\end{itemize}
+
+% ========================================================
+
+\subsection{Batch Gradient Descent}
+\begin{itemize}
+    \item Take steps in the opposite direction of the gradient
+    $$ \bm \beta^{(k + 1)} \leftarrow \bm \beta^{(k)} - \alpha \frac{d \L (\bm \beta^{(k)})}{d \bm \beta}$$
+    with $\alpha > 0$ the learning rate. 
+    \item With $\alpha$ too big, method might diverge. With $\alpha$ too small, convergence is slow.
+\end{itemize}
+
+% ========================================================
+
+\subsection{Gradients for MSE}
+\begin{myalign*}
+    \*{\tilde{X}} = [1 \hspace{5 pt} \*X]
+\end{myalign*}
+
+\begin{itemize}
+    \item We define the error vector $\* e$:
+    \begin{myalign*}
+        \*e = \* y - \*{\tilde{X}} \bm \beta 
+    \end{myalign*}
+    \item and MSE as follows:
+    \begin{myalign*}
+        \L(\bm \beta) = \frac{1}{2N} \sum^N_{n = 1} (y_n - \*{\tilde{x}}_n^T \bm \beta)^2 = \frac{1}{2N} \*e^T \*e
+    \end{myalign*}
+    \item then the gradient is given by
+    \begin{myalign*}
+        \frac{d \L}{d \bm \beta} = - \frac{1}{N} \*{\tilde{X}}^T \*e
+    \end{myalign*}
+
+    \item Optimality conditions:
+    \begin{enumerate}
+        \item \textit{necessary}: gradient equal to zero: $\frac{d \L(\bm \beta^*)}{d \bm \beta} = 0$
+        \item \textit{sufficient}: Hessian matrix is positive definite: $\* H(\bm \beta^*) = \frac{d^2 \L(\bm \beta^*)}{d \bm \beta d \bm \beta^T}$
+    \end{enumerate}
+
+    \item Very sensitive to illconditioning. Therefore, always normalize your feature otherwise step-size selection is difficult since different directions might move at different speed.
+    \item \textit{Complexity}: $O(NDI)$ with $I$ the number of iterations
+\end{itemize}
+
+% ========================================================
+
+\subsection{Least Squares}
+\begin{itemize}
+    \item In some cases, we can compute the minimum of the cost function analytically.
+
+    \item use the first optimality conditions:
+    \begin{myalign*}
+        \frac{d \L}{d \bm \beta} = 0 \Rightarrow \*{\tilde{X}}^T \*e = \*{\tilde{X}}^T (\*y - \*{\tilde{X}} \bm \beta)=  0
+    \end{myalign*}
+    \item When $\*{\tilde{X}}^T\*{\tilde{X}}$ is invertible, we have the closed-form expression
+    \begin{myalign*}
+        \bm \beta^* = (\*{\tilde{X}}^T\*{\tilde{X}})^{-1} \*{\tilde{X}}^T \*y
+    \end{myalign*}
+    \item thus we can predict values for a new $\* x_*$
+    \begin{myalign*}
+        y_* = \*{\tilde{x}^T_*} \bm \beta^* = \*{\tilde{x}^T_*}(\*{\tilde{X}}^T\*{\tilde{X}})^{-1} \*{\tilde{X}}^T \*y
+    \end{myalign*}
+    \item The \textbf{Gram matrix} $\*{\tilde{X}}^T\*{\tilde{X}}$ is positive definite and is also invertible iff $\*{\tilde{X}}$ has full column rank.
+    
+    \item \textit{Complexity}: $O(ND^2 + D^3) \equiv O(ND^2)$
+
+    \item $\*{\tilde{X}}$ can be rank deficient when $D > N$ or when the comlumns $\*{\bar{x}}_d$ are nearly collinear. In this case, the matrix is ill-conditioned, leading to numerical issues.
+\end{itemize}
+
+% ========================================================
+
+\subsection{Maximum Likelihood}
+\begin{itemize}
+    \item Let define our mistakes $\epsilon_n \sim \N(0, \sigma^2)$.
+    \begin{myalign*}
+        \rightarrow y_n = \*{\tilde{x}}_n^T \bm \beta + \epsilon_n
+    \end{myalign*}    
+    \item Another way of expressing this:
+    \begin{myalign*}
+        p(\*y | \*{\tilde{X}, \bm \beta}) &= \prod_{n = 1}^N p(y_n | \*{\tilde{x}}_n, \bm \beta)\\
+        &= \prod_{n = 1}^N \N(y_n | \*{\tilde{x}}_n^T \bm \beta, \sigma^2)
+    \end{myalign*}
+    which defines the likelihood of observating $\* y$ given $\*{\tilde{X}}$ and $\bm \beta$
+    \item Define cost with log-likelihood
+    \begin{myalign*}
+        \L_{lik}(\bm \beta) &= \log p(\*y | \*{\tilde{X}}, \bm \beta)\\
+        &= - \frac{1}{2 \sigma^2} \sum^N_{n = 1} (y_n - \*{\tilde{x}}_n^T \bm \beta)^2 + cnst
+    \end{myalign*}
+    \item Maximum likelihood estimator (MLE) gives another way to design cost functions
+    \begin{myalign*}
+        \argmin_{\bm \beta} \L_{mse}(\bm \beta) = \argmax_{\bm \beta} \L_{lik}(\bm \beta)
+    \end{myalign*}
+    \item MLE can also be interpreted as finding the model under which the obeserved data is most likely to have been generated from.
+    \item With Laplace distribution
+    \begin{myalign*}
+        p(y_n | \*{\tilde{x}}_n, \bm \beta) = \frac{1}{2b} e^{-\frac{1}{b}|y_n - \*{\tilde{x}}_n^T \bm \beta|}
+    \end{myalign*}
+    \begin{myalign*}
+        \sum_n \log p(y_n | \*{\tilde{x}}_n, \bm \beta) = \sum_n |y_n - \*{\tilde{x}}_n^T \bm \beta| + cnst
+    \end{myalign*}
+
+\end{itemize}
+
+% ========================================================
+
+\subsection{Ridge Regression}
+\begin{itemize}
+    \item Linear models usually underfit. One way is to use nonlinear basis functions instead.
+    \begin{myalign*}
+        y_n = \beta_0 + \sum_{j = 1}^M \beta_j \phi_j(\*x_n) = \bm{\tilde{\phi}}(\*x_n)^T \bm \beta
+    \end{myalign*}
+    \item This model is linear in $\bm \beta$ but nonlinear in $\*x$. Note that the dimensionality is now M, not D.
+    \item Polynomial basis
+    \begin{myalign*}
+        \bm \phi(x_n) = [1, x_n , x_n^2 , ..., x_n^M]
+    \end{myalign*}
+    \item The least square solution becomes
+    \begin{myalign*}
+        \bm \beta^*_{lse} = (\bm{\tilde{\Phi}}^T\bm{\tilde{\Phi}})^{-1}\bm{\tilde{\Phi}}^T \*y
+    \end{myalign*}
+
+    \item Complex models overfit easily. Thus we can choose simpler models by adding a \textbf{regularization term} which penalizes complex models
+    \begin{myalign*}
+        \min_{\bm \beta} 
+        \left( 
+        	\L(\bm \beta) + \frac{\lambda}{2N} \sum^M_{j = 1} \beta_j^2 
+        \right)
+    \end{myalign*}
+
+    \begin{myalign*}
+        \bm \beta^* = \argmin_{\bm \beta} 
+        \left(
+        	\frac{1}{2}(\*y - \*X \bm \beta)^T(\*y - \*X \bm \beta) + \frac{\lambda}{2} \bm \beta^T \bm \beta
+        \right)
+    \end{myalign*}
+
+    \item Note that $\beta_0$ is not penalized.
+    \item By differentiating and setting to zero we get
+    \begin{myalign*}
+        \bm \beta_{ridge} = (\bm{\tilde{\Phi}}^T\bm{\tilde{\Phi}} + \bm{\Lambda})^{-1} \bm{\tilde{\Phi}}^T \*y
+    \end{myalign*}
+    \begin{myalign*}
+        \bm{\Lambda} = 
+        \left[
+            \begin{array}{c c}
+                0 & \underline{0}  \\
+                \underline{0} & \lambda I_m
+            \end{array}
+        \right]
+    \end{myalign*}
+    \item Ridge regression improves the condition number of the Gram matrix since the eigenvalues of $(\bm{\tilde{\Phi}}^T\bm{\tilde{\Phi}} + \lambda I_m)$ are at least $\lambda$ %LEARN
+
+    \item \textbf{Maximum-a-posteriori (MAP) estimator}: %LEARN
+	     \begin{itemize}
+	     	\item Maximizes the product of the likelihood \textit{and} the \textbf{prior}.
+	     	\begin{myalign*}
+	     	     \bm \beta_{map} = \argmax_{\bm \beta} 
+	     	     \left(
+	     	     	p(\*y | \*X, \bm \Lambda)p(\bm \beta | \bm \Sigma)
+	     	     \right)
+	     	 \end{myalign*} 
+	     	\item Assume $\beta_0 = 0$
+	     	\begin{myalign*}
+	     	    \bm \beta_{ridge} = \argmax_{\bm \beta}
+	     	    \left(
+		     	    \log 
+		     	    \left[
+		     	    	\prod_{n = 1}^N \N(y_n | \*x^T_n \bm \beta, \bm \Lambda) \times \N(\bm \beta | 0, \*I)
+		     	    \right]
+		     	\right)
+	     	\end{myalign*}
+	     \end{itemize}
+	\item \textbf{Lasso regularizer} forces some $\beta_i$ to be strictly 0 and therefore forces sparsity in the model.
+	\begin{myalign*}
+	    \min_{\bm \beta} \frac{1}{2 N} \sum_{n = 1}^N(y_n - \bm{\tilde{\phi}}(\*x_n)^T \bm \beta)^2, \hspace{10pt} \text{ such that } \sum_{i = 1}^M |\beta_i| \leq \tau
+	\end{myalign*}
+\end{itemize}
+% ========================================================
+
+\subsection{Cross-Validation}
+\begin{itemize}
+	\item We should choose $\lambda$ to minimize the mistakes that will be made in the future.
+	\item We split the data into train and validation sets and we pretend that the validation set is the future data. We fit our model on the training set and compute a prediction-error on the validation set. This gives us an \textit{estimate} of the \textit{generalization error}.
+	\item \textbf{K-fold cross validation} randomly partition the data into $K$ groups. We train on $K - 1$ groups and test on the remaining group. We repeat this until we have tested on all $K$ sets. We then average the results.
+	\item Cross-validation returns an unbiased estimate of the generalization error and its variance.
+\end{itemize}
+% ========================================================
+
+\subsection{Bias-Variance decomposition}
+\begin{itemize}
+	\item The expected test error can be expressed as the sum of two terms
+	\begin{itemize}
+	 	\item \textbf{Squared bias}: The average \textit{shift} of the predictions 
+	 	\item \textbf{Variance}: measure how data points vary around their average.
+	 \end{itemize} 
+	 \begin{center}
+	 	expected loss $= (\text{bias})^2$ + variance + noise
+	 \end{center}
+	\item Both model bias and estimation bias are important
+	\item Ridge regression increases estimation bias while reducing variance
+	\item Increasing model complexity increases test error
+	\begin{center}
+		Small $\lambda \rightarrow$ low bias but large variance
+	\end{center}
+	\begin{center}
+		Large $\lambda \rightarrow$ large bias but low variance
+	\end{center}
+\end{itemize}
+% ========================================================
+
+\subsection{Logistic Regression}
+
+% ========================================================
+\begin{itemize}
+	\item \textbf{Classification} relates input variables $\*x$ to discrete output variable $y$
+	\item \textbf{Binary classifier}: we use $y = 0$ for $\*C_1$ and $y = 1$ for $\*C_2$.
+	\item Can use least-squares to predict $\hat{y}_*$
+	\begin{myalign*}
+	    \hat{y} = 
+	    \left\{
+	    	\begin{array}{c c}		
+	    		\*C_1 & \hat{y}_* < 0.5 \\
+	    		\*C_2 & \hat{y}_* \geq 0.5 \\
+	    	\end{array}		
+	    \right.
+	\end{myalign*}
+	\item \textbf{Logistic function}
+	\begin{myalign*}
+	    \sigma(x) = \frac{\exp(x)}{1 + \exp(x)}
+	\end{myalign*}
+	\begin{myalign*}
+	    p(y_n = \*C_1| \*x_n) = \sigma(\tilde{\*x}^T \bm \beta)\\
+	    p(y_n = \*C_2 | \*x_n) = 1 - \sigma(\tilde{\*x}^T \bm \beta)
+	\end{myalign*}
+	\item The probabilistic model:
+	\begin{myalign*}
+	    p(\*y | \*X, \bm \beta) = \prod_{n = 1}^N \sigma(\tilde{\*x}_n^T \bm \beta)^{y_n}(1 - \sigma(\tilde{\*x}_n^T \bm \beta)^{1 - y_n}
+	\end{myalign*}
+	\item The log-likelihood:
+	\begin{myalign*}
+	    \L_{mle}(\bm \beta) = \sum_{n = 1}^N
+	    \left(
+	    	y_n \tilde{\*x}_n^T \bm \beta - \log(1 + \exp(\tilde{\*x}_n^T \bm \beta))
+	    \right)
+	\end{myalign*}
+	\item We can use the fact that
+	\begin{myalign*}
+	    \frac{d}{dx}\log(1 + \exp(x)) = \sigma(x)
+	\end{myalign*}
+	\item Gradient of the log-likelihood %LEARN
+	\begin{myalign*}
+	    \*g = \frac{d \L}{d \bm \beta} &= \sum_{n = 1}^N 
+	    \left( 
+	    	\tilde{\*x}_n y_n - \tilde{\*x}_n \sigma(\tilde{\*x}_n^T \bm \beta)
+	    	\right) \\
+	    &= - \*{\tilde{X}}^T[\sigma(\*{\tilde{X}} \bm \beta) - \*y]
+	\end{myalign*}
+	\item The negative of the log-likelihood $- \L_{mle}(\bm \beta)$ is convex
+	\item \textbf{Hessian} of the log-likelihood
+	\begin{itemize}
+		\item We know that
+		\begin{myalign*}
+		    \frac{d \sigma(t)}{dt} = \sigma(t)(1 - \sigma(t))
+		\end{myalign*}
+		\item Hessian is the derivative of the gradient
+		\begin{myalign*}
+		    \*H(\bm \beta) = - \frac{d \*g(\bm \beta)}{d \bm \beta^T}  &= \sum_{n = 1}^N \frac{d}{d \bm \beta^T} \sigma(\tilde{\*x}_n^T \bm \beta) \tilde{\*x}_n\\
+		    &= \sum_{n = 1}^N \tilde{\*x}_n \sigma(\tilde{\*x}_n^T \bm \beta)(1 - \sigma(\tilde{\*x}_n^T \bm \beta)) \tilde{\*x}_n^T\\
+		    &= \tilde{\*X}^T \*S \tilde{\*X}
+		\end{myalign*}
+		where $\*S$ is a $N \times N$ diagonal matrix with diagonals
+		\begin{myalign*}
+		    S_{nn} = \sigma(\tilde{\*x}_n^T \bm \beta)(1 - \sigma(\tilde{\*x}_n^T \bm \beta))
+		\end{myalign*}
+		\item The negative of the log-likelihood is not strictly convex.
+	\end{itemize}
+	\item \textbf{Newton's Method} %LEARN
+	\begin{itemize}
+		\item Uses second-order information and takes steps in the direction that minimizes a quadratic approximation
+		\begin{myalign*}
+		    \L(\bm \beta) = \L(\bm \beta^{(k)}) + \*g_k^T (\bm \beta - \bm \beta^{(k)}) + (\bm \beta - \bm \beta^{(k)})^T \*H_k(\bm \beta - \bm \beta^{(k)})
+		\end{myalign*}
+		and it's minimum is at
+		\begin{myalign*}
+		    \bm \beta^{k + 1} = \bm \beta^{(k)} - \alpha_k \*H_k^{-1}\*g_k
+		\end{myalign*}
+		where $\*g_k$ is the gradient and $\alpha_k$ the learning rate.
+		\item Complexity: $O((ND^2 + D^3)I)$
+	\end{itemize}
+	\item \textbf{Penalized Logistic Regression}
+	\begin{myalign*}
+	    \min_{\bm \beta} 
+	    \left(
+	    	- \sum_{n = 1}^N \log p(y_n | \*x_n^T \bm \beta) + \lambda \sum_{d = 1}^D \beta^2_d
+	    \right)
+	\end{myalign*}
+\end{itemize}
+
+% ========================================================
+\section{Generalized Linear Model}
+\begin{itemize}
+	\item \textbf{Exponential family distribution}
+	\begin{myalign*}
+	    p(\*y | \bm \eta) = \frac{h(y)}{Z} \exp(\bm \eta^T \bm \phi(\*y) - A(\bm \eta))
+	\end{myalign*}
+	\begin{itemize}
+		\item Bernoulli distribution
+		\begin{myalign*}
+		    p(y | \mu) &= \mu^y (1- \mu)^{1 - y}\\
+		    &= \exp(y \log(\frac{\mu}{1 - \mu} + \log(1 - \mu)))
+		\end{myalign*}
+		\item there is a relationship between $\eta$ and $\mu$ throught the \textbf{link function}
+		\begin{myalign*}
+		    \eta = \log(\frac{\mu}{1 - \mu}) \leftrightarrow \mu = \frac{e^{\eta}}{1 + e^{\eta}}
+		\end{myalign*}
+		\item Note that $\mu$ is the mean parameter of $y$
+	\end{itemize}
+	\item Relationship between the mean $\bm \mu$ and $\bm \eta$ is defined using a link function $g$
+	\begin{myalign*}
+	    \bm \eta = \*g(\bm \mu) \Leftrightarrow \bm \mu = \*g^{-1}(\bm \eta)
+	\end{myalign*}
+	\item First and second derivatives of $A(\eta)$ are related to the mean and the variance
+	\begin{myalign*}
+	    \frac{d A(\eta)}{d \eta} = E[\bm \phi(\eta)], \hspace{4pt} \frac{d^2 A(\eta)}{d \eta^2} = Var[\bm \phi(\eta)]
+	\end{myalign*}
+	\item $A(\eta)$ is convex
+	\item The generalized maximum likelihood cost to minimize is
+	\begin{myalign*}
+	    \min_{\bm \beta} \L(\bm \beta) = - \sum_{n = 1}^N \log(p(y_n | \tilde{\*x}^T_n \bm \beta))
+	\end{myalign*}
+	where $p(y_n | \tilde{\*x}^T_n \bm \beta)$ is an exponential family distribution
+	\item We obtain the solution
+	\begin{myalign*}
+	    \frac{d \L}{d \bm \beta} = \tilde{\*X}^T[\*g^{-1}(\bm \eta) - \bm \phi(\*y)]
+	\end{myalign*}
+\end{itemize}
+
+% ========================================================
+
+\section{k-Nearest Neighbor (k-NN)}
+\begin{itemize}
+	\item The k-NN prediction for $\*x$ is
+	\begin{myalign*}
+	    f(\*x) = \frac{1}{k} \sum_{\*x_n \in nbh_k(\*x)} y_n
+	\end{myalign*}
+	where $nbh_k(\*x)$ is the neightborhood of $\*x$ defined by the k closest points $\*x_n$ in the training data
+	\item \textbf{Curse of dimensionality}: Generalizing correctly becomes exponentially harder as the dimensionality grows.
+	\item Gathering more inputs variables may be a bad thing
+\end{itemize}
+
+% ========================================================
+
+\section{Kernel Ridge Regression}
+\begin{itemize}
+	\item The following is true for ridge regression
+	\begin{align}
+	    \bm \beta &= (\*X^T \*X + \lambda \*I_D)^{-1} \*X^T \*y \\
+	    &= \*X^T(\*X\*X^T + \lambda \*I_N)^{-1} \*y \\
+	    &= \*X^T \bm \alpha \nonumber
+	\end{align}
+	\item Complexity of computing $\bm \beta$
+	\begin{enumerate}
+		\item $O(D^2 N + D^3)$
+		\item $O(N^2 D + N^3)$
+	\end{enumerate}
+	\item Thus we have
+	\begin{myalign*}
+	    \bm \beta = \sum_{n = 1}^N \alpha_n \*x_n, \hspace{5pt} \*y = \sum_{d = 1}^D \beta_d \*{\bar{x}}_d
+	\end{myalign*}
+	with $\*x_n$ the rows of $\*X$ and $\*{\bar{x}}_d$ the columns of $\*X$ 
+	\item The representer theorem allows us to write an equivalent optimization problem în terms of $\bm \alpha$.
+	\begin{myalign*}
+	    \bm \alpha = \argmax_{\bm \alpha} 
+	    \left(
+	    - \frac{1}{2}\bm \alpha (\*X \*X^T + \lambda \*I_N)^T \bm \alpha + \bm \alpha^T \*y 
+	    \right)
+	\end{myalign*}
+	\item $\*X \*X^T$ is called the \textbf{kernel matrix}
+	\item Kernelized rigde regression might be computationally more efficient in some cases.
+	\item \textbf{Kernel trick}: 
+	\begin{itemize}
+		\item We can work directly with $\*K = \*X \*X^T $ and never have to worry about $\*X$
+		\item Using the basis function $\bm \phi(\*x)$, we do not need to specify it explicitly, since we can work directly with $\*K = \bm \phi(\*x)$
+		\item We will use a kernel function $k(\*x, \*x') = \bm \phi(\*x)^T \bm \phi(\*x')$
+		\item The evaluation of a kernel is usually faster with $k$ than with $\bm \phi$
+	\end{itemize}
+	\item \textbf{Radial Basis function kernel (RBF)}
+	\begin{myalign*}
+	     k(\*x, \*x') = \exp(- \frac{1}{2}(\*x - \*x')^T (\*x - \*x'))
+	 \end{myalign*} 
+
+	\item Properties of a kernel to ensure the existance of a corresponding $\bm \phi$:
+	\begin{itemize}
+		\item $\*K$ should be symmetric: $k(\*x, \*x') = k(\*x', \*x)$
+		\item $\* K$ should be positive semidefinite.
+	\end{itemize}
+\end{itemize}
+
+% ========================================================
+
+\section{Support Vector Machine} % LEARN
+\begin{itemize}
+	\item \textbf{Hinge loss}
+		\begin{myalign*}
+		    [t]_+ = \max(0,t)
+		\end{myalign*}
+	\item Solution to the dual problem is sparse and non-zero entries will be our \textbf{support vectors}.
+	\item Assume $y_n \in \{-1, 1\}$
+	\item SVM optimizes the following cost
+	\begin{myalign*}
+	    \min_{\bm \beta} \sum_{n = 1}^N [1 - y_n \tilde{\bm \phi}_n^T \bm \beta]_+ + \frac{\lambda}{2} \sum_{j = 1}^M \beta^2_j
+	\end{myalign*}
+	\item The minimum doesn't change with a rescaling of $\bm \beta$
+	\item \textbf{Duality}:
+	\begin{itemize}
+		\item Hard to minimize $g(\bm \beta)$ so we define
+		\begin{myalign*}
+		    g(\bm \beta) = \max_{\bm \alpha} G(\bm \beta, \bm \alpha)
+		\end{myalign*}
+		\item we use the property that
+		\begin{myalign*}
+		    C[v_n]_+ = \max(0, C v_n) = \max_{\alpha_n \in [0, C]} \alpha_n v_n
+		\end{myalign*}
+		\item We can rewrite the problem as
+		\begin{myalign*}
+		    \min_{\bm \beta} \max_{\bm \alpha \in [0, C]^N} \sum_{n = 1}^N \alpha_n (1 - y_n \tilde{\bm \phi}_n^T \bm \beta) + \frac{1}{2} \sum_{j = 1}^M \beta_j^2
+		\end{myalign*}
+		\item This is differentiable, convex in $\bm \beta$ and concave in $\bm \alpha$
+		\item \textbf{Minimax theorem}: 
+		\begin{myalign*}
+		    \min_{\bm \beta} \max_{\bm \alpha} G(\bm \beta, \bm \alpha) = \max_{\bm \alpha} \min_{\bm \beta} G(\bm \beta, \bm \alpha)
+		\end{myalign*}
+		because $G$ is convex in $\bm \beta$ and concave in $\bm \alpha$.
+		\item Derivative w.r.t. $\bm \beta$:
+		\begin{myalign*}
+		    \frac{d G}{d \bm \beta} = - 
+		    \left(
+		    	\sum_{n = 1}^N \alpha y_n \tilde{\phi_n}
+		    \right)
+		    + 
+		    \left[
+		    	\begin{array}{c}
+		    		0 \\ \bm \beta_{1 : M}
+		    	\end{array}
+		    \right]
+		\end{myalign*}
+		\item Equating this to 0, we get:
+			\begin{myalign*}
+			    &\bm \beta^*_{1 : M} = \sum^N_{n = 1} \alpha_n y_n \phi_n = \bm \Phi^T \text{diag}(\*y) \bm \alpha\\
+			    &\bm \alpha^T \*y = 0
+			\end{myalign*}
+		\item Plugging $\bm \beta^*$ back in the dual problem
+		\begin{myalign*}
+		    \max_{\bm \alpha \in [0, C]^N} \bm \alpha^T \*1 - \frac{1}{2} \bm \alpha^T \*Y \bm \Phi \bm \Phi \* Y \bm \alpha
+		\end{myalign*}
+		\item This is a differentiable least-squares problem. Optimization is easy using Sequential Minimal Optimization. It is also naturally kernelized with $\*K = \bm \Phi \bm \Phi^T$
+		\item The solution $\bm \alpha$ is sparse and is non-zero only for the training examples that are instrumental in determining the decision boundary.
+	\end{itemize}
+\end{itemize}
+
+% ========================================================
+
+\section{K-means}
+\begin{itemize}
+	\item \textbf{Unsupervised learning}: Represent particular input patterns in a way that reflects the statistical structure of the overall collections of input partterns.
+	\item \textbf{Cluster} are groups of points whose inter-point distances are small compared to the distances outside the cluster.
+	\begin{myalign*}
+	    \min_{\*r, \bm \mu} \L(\*r, \bm \mu) = \sum_{k = 1}^K \sum_{n = 1}^N r_{nk} ||\*x_n - \bm \mu_k||^2_2
+	\end{myalign*}
+	such that $r_{nk} \in \{0, 1\}$ and $\sum_{k = 1}^K r_{nk} = 1$
+	\item K-means algorithm: \\
+	Initialize $\bm \mu_k$, then iterate
+	\begin{enumerate}
+		\item For all n, compute $\*r_n$ given $\bm \mu$
+		\begin{myalign*}
+		    r_{nk} = 
+		    \left\{
+		    	\begin{array}{c c}
+		    		1 & \text{ if } k = \argmin_j || \*x_n - \bm \mu ||^2_2\\
+		    		0 & \text{otherwise}
+		    	\end{array}
+		    \right.
+		\end{myalign*}
+		\item For all $k$, compute $\mu_k$ given $\*r$
+		\begin{myalign*}
+		    \bm \mu_k = \frac{\sum_{n = 1}^N r_{nk} \*x_n}{\sum_{n = 1}^N r_{nk}}
+		\end{myalign*}
+	\end{enumerate}
+	\item A good initialization procedure is to choose the prototypes to be equal to a random subset of $K$ data points.
+	\item Probabilistic model
+	\begin{myalign*}
+	    p(\*r, \bm \mu) = \prod_{n = 1}^N \prod_{k = 1}^K 
+	    \left[
+	    	\N(\*x_n | \bm \mu_k, \*I)
+	    \right]^{r_{nk}}
+	\end{myalign*}
+
+	\item Computation can be heavy, each example can belong to only on cluster and clusters have to be spherical.
+\end{itemize}
+
+% ========================================================
+
+\section{Gaussian Mixture Models}
+\begin{itemize}
+	\item Clusters can be spherical using a full covariance matrix instead of isotropic covariance.
+	\begin{myalign*}
+	    p(\*X | \bm \mu, \bm \Sigma, \*r) = \prod_{n = 1}^N \prod_{k = 1}^K 
+		    \left[
+		    	\N(\*x_n | \bm \mu_k, \* \bm \Sigma_k)
+		    \right]^{r_{nk}}
+	\end{myalign*}
+
+	\item \textbf{Soft-clustering}: Points can belong to several cluster by defining $r_n$ to be a random variable.
+	\begin{myalign*}
+		p(r_{nk} = 1) &= \pi_k \text{ where } \pi_k > 0, \forall k \\ %LEARN
+		\sum_{k = 1}^K \pi_k &= 1
+	\end{myalign*}
+
+	\item Joint distribution of Gaussian mixture model
+	\begin{myalign*}
+	    p(\*X, \*r | \bm \mu, \bm \Sigma, \bm \pi)
+	    &= \prod_{n = 1}^N
+	    \left[
+	    	p(\*x_n | r_n, \bm \mu, \Sigma) p(r_n | \bm \pi)
+	    \right]\\
+	    &=
+	    \left[
+	    	\prod_{k = 1}^K [(\N(\*x_n |\bm \mu_k, \Sigma_k))^{r_{nk}}] \prod_{k = 1}^K [\pi]^{r_{nk}}
+	    \right]
+	\end{myalign*}
+	\begin{center}
+		Joint = Likelihood $\times$ Prior
+	\end{center}
+	\item $r_n$ are called \textit{latent} unobserved variables
+	\item Unknown parameters are given by $ \bm \theta = \{\bm \mu, \bm \Sigma, \bm \pi\}$
+	\item We get the \textbf{marginal likelihood} by marginalizing $r_n$ out from the likelihood
+	\begin{myalign*}
+	    p(\*x_n | \bm \theta) & = \sum_{k = 1}^K p(\*x_n, r_n = k | \bm \theta)\\
+	    &= \sum_{k = 1}^K p(r_n = k | \bm \theta) p(\*x_n | r_n = k, \bm \theta)\\
+	    &= \sum_{k = 1}^K \pi_k \N(\*x_n | \bm \mu_k, \bm \Sigma_k)
+	\end{myalign*}
+	\item Without a latent variable model, number of parameters grow at rate $O(N)$
+	\item After marginalization, the growth is reduced to $O(D^2 K)$
+
+	\item To get maximum likelihood estimate of $\bm \theta$, we maximize
+	\begin{myalign*}
+	    \max_{\bm \theta} \sum_{n = 1}^N \log \sum_{k = 1}^K \pi_k \N(\*x_n | \bm \mu_k, \bm \sigma_k)
+	\end{myalign*}
+\end{itemize}
+
+% ========================================================
+
+\section{Expectation Maximization Algorithm} %LEARN
+
+\begin{itemize}
+	\item \textit{[ALGORITHM]} Start with $\bm \theta^{(1)}$ and iterate
+	\begin{enumerate}
+		\item \textit{Expectation step}: Compute a lower bound to the cost such that it is tight at the previous $\bm \theta^{(i)}$
+
+		\begin{myalign*}
+		    \log \sum_{k = 1}^K \pi_k \N(\*x_n | \bm \mu_k, \bm \Sigma_k) \geq \sum_{k = 1}^K p_{kn} \log \frac{\pi_k \N(\*x_n | \bm \mu_k, \bm \Sigma_k)}{p_{kn}}
+		\end{myalign*}
+		with equality when,
+		\begin{myalign*}
+		    p_{kn} = \frac{\pi_k \N(\*x_n, \bm \Sigma_k)}{\sum_{k = 1}^K \pi_k \N(\*x_n | \bm \mu_k, \bm \Sigma_k)}
+		\end{myalign*}
+		\item \textit{Maximization step}: Update $\bm \theta$
+		\begin{myalign*}
+		    \bm \theta^{(i + 1)} = \argmax_{\bm \theta} \L(\bm \theta, \bm \theta^{(i)})
+		\end{myalign*}
+
+		\begin{myalign*}
+		    \bm \mu_k^{i + 1} = \frac{\sum_{n = 1}^N p_{kn}^{(i)} \*x_n}{\sum_{n = 1}^N p_{kn}^{(i)}}
+		\end{myalign*}
+
+		\begin{myalign*}
+		    \bm\Sigma_k^{(i + 1)} = \frac{\sum_{n = 1}^N p_{kn}^{(i)} (\*x_n - \bm \mu_k^{(i + 1)})(\*x_n - \bm \mu_k^{(i + 1)})^T}{\sum_{n = 1}^N p_{kn}^{(i)}}
+		\end{myalign*}
+
+		\begin{myalign*}
+		    \pi_k^{(i + 1)} = \frac{1}{N} \sum_{n = 1}^N p_{kn}^{(i)}
+		\end{myalign*}
+	\end{enumerate}
+	\item If the covariance is diagonal, then we have K-means.
+\end{itemize}
+
+% ========================================================
+
+\section{Matrix factorization}
+\begin{itemize}
+	\item We have $D$ movies and $N$ users
+	\item $\*X$ is a matrix $D \times N$ with $x_{dn}$ the rating of n'th user for d'th movie.
+	\item We project data vectors $\*x_n$ to a smaller dimension $\*z_n \in \Bbb R^M$
+	\item We have now 2 latent variables:
+	\begin{itemize}
+		\item $\*Z$ a $N \times M$ matrix that gives features for the users
+	 	\item $\*W$ a $D \times M$ matrix that gives features for the movies
+	 \end{itemize} 
+	 \begin{myalign*}
+	     x_{dn} \approx \*w_d^T\*z_n
+	 \end{myalign*}
+	 \item We can add a regularizer and minimize the following cost:
+	 \begin{myalign*}
+	     \L(\*W, \*Z) = \frac{1}{2} \sum_{n = 1}^N \sum_{d = 1}^D (x_{dn} - \*w_d^T \*z_n)^2 + \frac{\lambda_w}{2} \sum_{d = 1}^D \*w_d^T\*w_d + \frac{\lambda_z}{2} \sum_{n = 1}^N \*z_n^T \*z_n
+	 \end{myalign*}
+	 \item We can use coordinate descent algorithm, by first minimizing w.r.t. $\*Z$ given $\*W$ and then minimizing $\*W$ given $\*Z$. This is called \textbf{Alternating least-squares (ALS)}:
+	 \begin{myalign*}
+	     \*Z^T &\leftarrow (\*W^T \*W + \lambda_z \*I_M)^{-1} \*W^T \*X \\
+	     \*W^T &\leftarrow (\*Z^T \*Z + \lambda_w \*I_M)^{-1} \*Z^T\*X^T
+	 \end{myalign*}
+	 \item \textit{Complexity}: $O(D N M^2 + N M^3) \rightarrow O(D N M^2)$
+	 \item Probabilistic model
+	 \begin{myalign*}
+	     \prod_{n = 1}^N \prod_{d \in O_n} \N(x_{dn} | \*w_d^T \*z_n, I) 
+	     \times \prod_{n = 1}^N \N(\*z_n | 0, \frac{1}{\lambda_z} I) 
+	     \times \prod_{d = 1}^D \N(\*w_d | 0, \frac{1}{\lambda_w} I)
+	 \end{myalign*}
+
+	 \item Since many ratings are missing we cannot normalize the data. A solution is to add offset terms:
+	 \begin{myalign*}
+	     \frac{1}{2} \sum_{n = 1}^N \sum_{d \in O_n} (x_{dn} - \*w_d^T \*z_n - w_{0d} - z_{0n} - \mu)^2
+	 \end{myalign*}
+\end{itemize}
+% ========================================================
+
+\section{Singular Value Decomposition}
+\begin{itemize}
+	\item Matrix factorization method
+	\begin{myalign*}
+	    \*X = \*U \*S \*V^T
+	\end{myalign*}
+	\begin{itemize}
+		\item $\*U$ is an $D \times D$ matrix
+		\item $\*V$ is an $N \times N$ matrix
+		\item $\*S$ is a non-negative diagonal matrix of size $D \times N$ which are called \textbf{singular values} appearing in a descending order.
+		\item Columns of $\*U$ and $\*V$ are the left and right \textbf{singular vectors} respectively.
+	\end{itemize}
+	\item Assuming $D < N$ we have
+	\begin{myalign*}
+	    \*X = \sum_{d = i}^D s_d \*u_d \*v_d^T
+	\end{myalign*}
+	This tells you about the spectrum of $\*X$ where higher singular vectors contain the \textit{low-frequency information} and lower singular values contain the \textit{high-frequency information}.
+    \item Let's now truncate these matrices
+    \begin{align*}
+        \*X &\approx \*U_{tr} \*S_{tr} \*V^*_{tr} \\
+        \*T_{tr} &\approx \*U_{tr} \*S_{tr} \\
+        \*T_{te} &\approx \*X_{te}\*V_{tr}
+    \end{align*}
+    with $\*T_{tr}$ the reduced feature set of $\*X$ and $\*T_{te}$ the reduced feature set of $\*X_{te}$
+\end{itemize}
+% ========================================================
+
+\section{Principal Componement Analysis}
+\begin{itemize}
+	\item PCA is a dimensionality reduction method and a method to decorrelate the data
+\begin{myalign*}
+    \*X \approx \tilde{\*X} = \*W \*Z^T
+\end{myalign*}
+such that columns of $\*W$ are orthogonal.
+\item If the data is zero mean
+\begin{myalign*}
+    \*C = \frac{1}{N} \*X \*X^T &\Rightarrow \*X \*X^T = \*U \*S^2 \*U^T \\
+    \Rightarrow \*U^T \*X \*X^T \*U &= \*U^T \*U \*S^2 \*U^T \*U = \*S^2\\
+\end{myalign*}
+\item Thus the columns of matrix $\*U$ are called the \textbf{principal components} and they decorrelate the covariance matrix.
+\item Using SVD, we can compute the matrices in the following way
+\begin{myalign*}
+    \*W &= \*U \*S^{1 / 2} \\
+    \*Z &= \*V \*S^{1 / 2}
+\end{myalign*}
+\end{itemize}
+
+% ========================================================
+
+\section{Belief Propagation}
+\begin{itemize}
+    \item the goal is to learn \textit{inference of the latent variables using belief propagation}
+    \item Given a directed acyclic graph $G$ and parameters $\theta$, a \textbf{Bayesian network} defines the joint distribution as follows
+    \begin{align*}
+        p_{\theta}(\*x) = \prod_{k = 1}^K p_{\theta}(x_k | \text{parents}_k)
+    \end{align*}
+    \item We can reduce the complexity by using the structure of the problem and the bayesian rule. %LEARN
+\end{itemize}
+
+% ========================================================
+
+\section{Multi-Layer Perceptron (MLP)} %LEARN
+\begin{itemize}
+    \item Known as \textbf{feed-forward neural network}
+    \item $\*z_n^{(k)}$ is the k'th hidden vector
+    \item $\*a_n^{(k)}$ is the corresponding activation
+    \item There are a total of $K$ layers
+    \begin{myalign*}
+        a_{mn}^{(k)} = (\bm \beta_m^{(k)})^T \*z_n^{(k - 1)}, \hspace{8pt} z_{mn}^{(k)} = h (a_{mn}^{(k)})
+    \end{myalign*}
+    \item For the first layer we have $\*z_n^{(0)} = \*x_n$
+    \item For the last layer, we use a link function to map $\*z_n^{(K - 1)}$ to the output $\*y_n$
+    \item A 1-layer MLP is simply a generalization of linear/logistic regression
+    \item $\*B^{(k)}$ a matrix with rows $(\bm \beta_m^{(k)})^T$
+    \begin{myalign*}
+        \*a_n^{(k)} = \* B^{(k)} \*z_n^{(k - 1)}, \hspace{8pt} \*z_n^{(k)} = h (\*a_n^{(k)})
+    \end{myalign*}
+    \item thus we have the input-output relationship
+    \begin{myalign*}
+        \hat{y}_n = g((\bm \beta^{(K - 1)})^T * h(\*B^{(K - 2)} * h(* ... * h(\*B^{(1)} * \*x_n)))
+    \end{myalign*}
+    with $g()$ the link function
+    \item We learn parameters $\*B$ using stochastic gradient-descent
+    \item Frequently used transfer function
+    \begin{myalign*}
+        g(a) = \tanh(a) = \frac{e^a - e^{-a}}{e^a + e^{-a}}
+    \end{myalign*}
+    \item \textbf{Backpropagation} is a technic to compute the gradient in time linear in the number of training points and the number of weights.
+\end{itemize}
+% ========================================================
+
+\section{Gaussian Process (GP)}
+\begin{itemize}
+    \item GP are a family of statistical distributions in which time plays a role and for which any finite linear combination of samples has a joint Gaussian distribution.
+    \item They can be completely defined by their second-order statistics which means that if they have mean zero, then defining the covariance function completely defines the process behaviour.
+    \item Let us place a probabilistic prior shape on the approximation of a function.
+    \item A GP process defines a prior over function f
+    \begin{align*}
+        p(\*f | X) = \N(\*f | \*0, K(X))
+    \end{align*}
+    \item $K(X)$ defines shape and prior knowledge about our problem
+    \begin{align*}
+        &p(\*f | \*y, \*X_*, \*X) \sim \N(\mu', \sigma')\\
+        & \mu' = K(\*X_*, \*X)[K(\*X,\*X) + \sigma_n^2 I]^{-1}\*y\\
+        & \*\sigma' = K(\*X_*, \*X_*) - K(\*X_*, \*X)[K(\*X, \*X) + \sigma_n^2 I] K(\*X, \*X_*)
+    \end{align*}
+    with $\sigma_n$ the variance of the noise
+    \item RBF kernel
+    \begin{align*}
+         k(\*x_n, \*x_m) = e^{-|| \*x_n - \*x_m||^2 / L^2}
+     \end{align*} 
+     \item Quadratic kernel 
+     \begin{align*}
+         k(\*x_n, \*x_m) = (1 + \*x_n^T \*x_m)^2
+     \end{align*}
+\end{itemize}
+% ========================================================
+
+\section{Decision Trees (DT)}
+\begin{itemize}
+    \item A decision tree is a structure in which each internal node represents a test on an attribute and each branch represents the outcome of the test and each leaf represents a class label.
+    \item Fast to train and fast to make predictions
+    \item Efficient for very high dimensional feature spaces and very large amounts of training data
+    \item Lack of smoothness and high variance (overfitting)
+    \item Goal: find a split (k, $\tau$) that minimizes an impurity measure at the leaves
+    \begin{itemize}
+        \item Find best feature to split on
+        \item Find best threshold
+    \end{itemize}
+\end{itemize}
+% ========================================================
+
+\section{Random Forests (RF)}
+\begin{itemize}
+    \item RF correct the overfitting bad "habit" of DTs.
+    \item Training: Learn M trees on different subsets (random) of training data
+    \item Prediction: Average of prediction of each tree
+    \item Variance of the model averaging:
+    \begin{align*}
+        z_1 = f_1 \hspace{5pt} &\Rightarrow \hspace{5pt} z_M = \frac{1}{M} \sum_{i = 1}^M f_i \\
+        V(z_1) = \sigma^2 \hspace{5pt} &\Rightarrow \hspace{5pt} V(z_M) = \frac{1}{M} \sigma^2 + \rho \frac{M - 1}{M} \sigma^2
+    \end{align*}
+    \item Variance reduction ratio:
+    \begin{align*}
+        \frac{V(z_1)}{V(z_M)} = \frac{M}{1 +\rho (M - 1)}
+    \end{align*}
+    \item 2 techniques for decorrelating trees:
+    \begin{itemize}
+        \item \textbf{Bagging}: Randomize training data
+        \item Randomized feature selection
+    \end{itemize}
+\end{itemize}
+
+% ========================================================
+
+% ========================================================
+
+% ========================================================
+
+% ========================================================
+
+% ========================================================
+
+
+
+

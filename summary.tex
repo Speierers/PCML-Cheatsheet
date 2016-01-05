@@ -170,7 +170,7 @@ Tukey's loss is non-convex, non-differentiable, but robust to outliers.
 \begin{myalign*}
     y_n &\equiv f(\* x_n) \\
     & := \beta_0 + \beta_1 x_{n1} + ... \\
-    & = \* x^T_n \bm \beta
+    & = \beta_0 + \* x^T_n \bm \beta
 \end{myalign*}
 with $\bm \beta$ the parameters of the model.
 \item Variance grows only linearly with dimensionality
@@ -284,9 +284,9 @@ with $\bm \beta$ the parameters of the model.
     \end{myalign*}
     \item Maximum likelihood estimator (MLE) gives another way to design cost functions
     \begin{myalign*}
-        \argmin_{\bm \beta} \L_{mse}(\bm \beta) = \argmax_{\bm \beta} \L_{lik}(\bm \beta)
+        \argmin_{\bm \beta} \L_{MSE}(\bm \beta) = \argmax_{\bm \beta} \L_{lik}(\bm \beta)
     \end{myalign*}
-    \item MLE can also be interpreted as finding the model under which the obeserved data is most likely to have been generated from.
+    \item MLE can also be interpreted as finding the model under which the observed data is most likely to have been generated from.
     \item With Laplace distribution
     \begin{myalign*}
         p(y_n | \*{\tilde{x}}_n, \bm \beta) = \frac{1}{2b} e^{-\frac{1}{b}|y_n - \*{\tilde{x}}_n^T \bm \beta|}
@@ -350,7 +350,7 @@ with $\bm \beta$ the parameters of the model.
 	     \begin{itemize}
 	     	\item Maximizes the product of the likelihood \textit{and} the \textbf{prior}.
 	     	\begin{myalign*}
-	     	     \bm \beta_{map} = \argmax_{\bm \beta} 
+	     	     \bm \beta_{MAP} = \argmax_{\bm \beta} 
 	     	     \left(
 	     	     	p(\*y | \*X, \bm \Lambda)p(\bm \beta | \bm \Sigma)
 	     	     \right)
@@ -430,11 +430,11 @@ with $\bm \beta$ the parameters of the model.
 	\end{myalign*}
 	\item The probabilistic model:
 	\begin{myalign*}
-	    p(\*y | \*X, \bm \beta) = \prod_{n = 1}^N \sigma(\tilde{\*x}_n^T \bm \beta)^{y_n}(1 - \sigma(\tilde{\*x}_n^T \bm \beta)^{1 - y_n}
+	    p(\*y | \*X, \bm \beta) = \prod_{n = 1}^N \sigma(\tilde{\*x}_n^T \bm \beta)^{y_n}(1 - \sigma(\tilde{\*x}_n^T \bm \beta))^{1 - y_n}
 	\end{myalign*}
 	\item The log-likelihood:
 	\begin{myalign*}
-	    \L_{mle}(\bm \beta) = \sum_{n = 1}^N
+	    \L_{MLE}(\bm \beta) = \sum_{n = 1}^N
 	    \left(
 	    	y_n \tilde{\*x}_n^T \bm \beta - \log(1 + \exp(\tilde{\*x}_n^T \bm \beta))
 	    \right)
@@ -556,8 +556,8 @@ with $\bm \beta$ the parameters of the model.
 	\end{align}
 	\item Complexity of computing $\bm \beta$
 	\begin{enumerate}
-		\item $O(D^2 N + D^3)$
-		\item $O(N^2 D + N^3)$
+		\item[(1)] $O(D^2 N + D^3)$
+		\item[(2)] $O(D N^2 + N^3)$
 	\end{enumerate}
 	\item Thus we have
 	\begin{myalign*}

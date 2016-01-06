@@ -61,6 +61,8 @@ $$ f(\lambda x_1 + (1 - \lambda) x_2) \leq \lambda f(x_1) + (1 - \lambda) f(x_2)
 
 \item $\*A^{-1}$ exist if $\*A$ is full rank
 
+\item $(\*A \*B)^T = \*B^T \*A^T$
+
 \item \textbf{Condition number} of a function measures how much the output value can change for a small change in the input argument. A matrix with a high condition number is said to be \textbf{ill-conditioned}. If $\*A$ is normal ($A^T A = A A^T$) then
 \begin{myalign*}
     k(\*A) = 
@@ -138,7 +140,7 @@ Tukey's loss is non-convex, non-differentiable, but robust to outliers.
 
 \textbf{Hinge loss}
 \begin{myalign*}
-    Hinge = [1 - y_n f(\* x_n)]_+
+    Hinge = [1 - y_n f(\* x_n)]_+ = \max(0, 1 - y_n f(\* x_n))
 \end{myalign*}
 
 \textbf{Logistic loss}
@@ -460,7 +462,7 @@ with $\bm \beta$ the parameters of the model.
 		\end{myalign*}
 		\item Hessian is the derivative of the gradient
 		\begin{myalign*}
-		    \*H(\bm \beta) = - \frac{d \*g(\bm \beta)}{d \bm \beta^T}  &= \sum_{n = 1}^N \frac{d}{d \bm \beta^T} \sigma(\tilde{\*x}_n^T \bm \beta) \tilde{\*x}_n\\
+		    \*H(\bm \beta) &= - \frac{d \*g(\bm \beta)}{d \bm \beta^T}  = \sum_{n = 1}^N \frac{d}{d \bm \beta^T} \sigma(\tilde{\*x}_n^T \bm \beta) \tilde{\*x}_n\\
 		    &= \sum_{n = 1}^N \tilde{\*x}_n \sigma(\tilde{\*x}_n^T \bm \beta)(1 - \sigma(\tilde{\*x}_n^T \bm \beta)) \tilde{\*x}_n^T\\
 		    &= \tilde{\*X}^T \*S \tilde{\*X}
 		\end{myalign*}
@@ -474,7 +476,7 @@ with $\bm \beta$ the parameters of the model.
 	\begin{itemize}
 		\item Uses second-order information and takes steps in the direction that minimizes a quadratic approximation
 		\begin{myalign*}
-		    \L(\bm \beta) = \L(\bm \beta^{(k)}) + \*g_k^T (\bm \beta - \bm \beta^{(k)}) + (\bm \beta - \bm \beta^{(k)})^T \*H_k(\bm \beta - \bm \beta^{(k)})
+		    \L(\bm \beta) = \L(\bm \beta^{(k)}) + \*g_k^T (\bm \beta - \bm \beta^{(k)})\\ + (\bm \beta - \bm \beta^{(k)})^T \*H_k(\bm \beta - \bm \beta^{(k)})
 		\end{myalign*}
 		and it's minimum is at
 		\begin{myalign*}
@@ -551,8 +553,7 @@ with $\bm \beta$ the parameters of the model.
 	\item The following is true for ridge regression
 	\begin{align}
 	    \bm \beta &= (\*X^T \*X + \lambda \*I_D)^{-1} \*X^T \*y \\
-	    &= \*X^T(\*X\*X^T + \lambda \*I_N)^{-1} \*y \\
-	    &= \*X^T \bm \alpha \nonumber
+	    &= \*X^T(\*X\*X^T + \lambda \*I_N)^{-1} \*y = \*X^T \bm \alpha \nonumber
 	\end{align}
 	\item Complexity of computing $\bm \beta$
 	\begin{enumerate}
@@ -571,40 +572,51 @@ with $\bm \beta$ the parameters of the model.
 	    - \frac{1}{2}\bm \alpha (\*X \*X^T + \lambda \*I_N)^T \bm \alpha + \bm \alpha^T \*y 
 	    \right)
 	\end{myalign*}
-	\item $\*X \*X^T$ is called the \textbf{kernel matrix}
-	\item Kernelized rigde regression might be computationally more efficient in some cases.
+	\item $\*K = \*X \*X^T$ is called the \textbf{kernel matrix} or \textbf{Gram matrix}.
+	\item If $\*K$ is positive definite, then it's called a \textbf{Mercer Kernel}.
+	\item $\*K_{i,j} = k(\*x_i, \*x_j)$
+	\item If the kernel is Mercer, then there exists a function $\bm \phi(\*x)$ s.t.
+	\begin{myalign*}
+	    k(\*x, \*x') = \bm \phi(\*x)^T \bm \phi(\*x')
+	\end{myalign*}
 	\item \textbf{Kernel trick}: 
 	\begin{itemize}
-		\item We can work directly with $\*K = \*X \*X^T $ and never have to worry about $\*X$
-		\item Using the basis function $\bm \phi(\*x)$, we do not need to specify it explicitly, since we can work directly with $\*K = \bm \phi(\*x)$
-		\item We will use a kernel function $k(\*x, \*x') = \bm \phi(\*x)^T \bm \phi(\*x')$
+		\item We can work directly with $\*K$ and never have to worry about $\*X$
+		\item Replace $\langle \*x, \*x' \rangle$ with $k(\*x, \*x')$.
+		\item Kernel function can be interpreted as a measure of similarity
 		\item The evaluation of a kernel is usually faster with $k$ than with $\bm \phi$
 	\end{itemize}
+	\item Kernelized rigde regression might be computationally more efficient in some cases.
 	\item \textbf{Radial Basis function kernel (RBF)}
 	\begin{myalign*}
 	     k(\*x, \*x') = \exp(- \frac{1}{2}(\*x - \*x')^T (\*x - \*x'))
 	 \end{myalign*} 
-
 	\item Properties of a kernel to ensure the existance of a corresponding $\bm \phi$:
 	\begin{itemize}
 		\item $\*K$ should be symmetric: $k(\*x, \*x') = k(\*x', \*x)$
 		\item $\* K$ should be positive semidefinite.
 	\end{itemize}
+	\item Thus we get
+	\begin{myalign*}
+	    \*y = \bm \beta^T \*x = \sum_{i = 1}^K \alpha_i \*x_i^T \*x = \sum_{i = 1}^K \alpha_i k(\*x, \*x_i) 
+	\end{myalign*}
 \end{itemize}
 
 % ========================================================
 
-\section{Support Vector Machine} % LEARN
+\section{Support Vector Machine} 
 \begin{itemize}
-	\item \textbf{Hinge loss}
-		\begin{myalign*}
-		    [t]_+ = \max(0,t)
-		\end{myalign*}
+	\item Combination of the kernel trick plus a modified loss function (Hinge loss)
 	\item Solution to the dual problem is sparse and non-zero entries will be our \textbf{support vectors}.
+	\item \textbf{Kernelised feature vector} where $\bm \mu_k$ are centroids
+	\begin{myalign*}
+	    \bm \phi(\*x) = [k(\*x, \bm \mu_1), ..., k(\*x, \bm \mu_K)]
+	\end{myalign*}
+	\item In practice we'll take a subset of data points to be prototype $\rightarrow$ \textbf{sparse vector machine}.
 	\item Assume $y_n \in \{-1, 1\}$
 	\item SVM optimizes the following cost
 	\begin{myalign*}
-	    \min_{\bm \beta} \sum_{n = 1}^N [1 - y_n \tilde{\bm \phi}_n^T \bm \beta]_+ + \frac{\lambda}{2} \sum_{j = 1}^M \beta^2_j
+	    g(\bm \beta) = \min_{\bm \beta} \sum_{n = 1}^N [1 - y_n \tilde{\bm \phi}_n^T \bm \beta]_+ + \frac{\lambda}{2} \sum_{j = 1}^M \beta^2_j
 	\end{myalign*}
 	\item The minimum doesn't change with a rescaling of $\bm \beta$
 	\item \textbf{Duality}:
@@ -717,22 +729,19 @@ with $\bm \beta$ the parameters of the model.
 	    p(\*X, \*r | \bm \mu, \bm \Sigma, \bm \pi)
 	    &= \prod_{n = 1}^N
 	    \left[
-	    	p(\*x_n | r_n, \bm \mu, \Sigma) p(r_n | \bm \pi)
+	    	p(\*x_n | \*r_n, \bm \mu, \bm \Sigma) p(\*r_n | \bm \pi)
 	    \right]\\
 	    &=
 	    \left[
-	    	\prod_{k = 1}^K [(\N(\*x_n |\bm \mu_k, \Sigma_k))^{r_{nk}}] \prod_{k = 1}^K [\pi]^{r_{nk}}
+	    	\prod_{k = 1}^K [(\N(\*x_n |\bm \mu_k, \bm \Sigma_k))^{r_{nk}}] \prod_{k = 1}^K [\pi]^{r_{nk}}
 	    \right]
 	\end{myalign*}
-	\begin{center}
-		Joint = Likelihood $\times$ Prior
-	\end{center}
 	\item $r_n$ are called \textit{latent} unobserved variables
 	\item Unknown parameters are given by $ \bm \theta = \{\bm \mu, \bm \Sigma, \bm \pi\}$
 	\item We get the \textbf{marginal likelihood} by marginalizing $r_n$ out from the likelihood
 	\begin{myalign*}
-	    p(\*x_n | \bm \theta) & = \sum_{k = 1}^K p(\*x_n, r_n = k | \bm \theta)\\
-	    &= \sum_{k = 1}^K p(r_n = k | \bm \theta) p(\*x_n | r_n = k, \bm \theta)\\
+	    p(\*x_n | \bm \theta) & = \sum_{k = 1}^K p(\*x_n, r_{nk} = 1 | \bm \theta)\\
+	    &= \sum_{k = 1}^K p(r_{nk} = 1 | \bm \theta) p(\*x_n | r_{nk} = 1, \bm \theta)\\
 	    &= \sum_{k = 1}^K \pi_k \N(\*x_n | \bm \mu_k, \bm \Sigma_k)
 	\end{myalign*}
 	\item Without a latent variable model, number of parameters grow at rate $O(N)$
@@ -740,7 +749,7 @@ with $\bm \beta$ the parameters of the model.
 
 	\item To get maximum likelihood estimate of $\bm \theta$, we maximize
 	\begin{myalign*}
-	    \max_{\bm \theta} \sum_{n = 1}^N \log \sum_{k = 1}^K \pi_k \N(\*x_n | \bm \mu_k, \bm \sigma_k)
+	    \max_{\bm \theta} \sum_{n = 1}^N \log \sum_{k = 1}^K \pi_k \N(\*x_n | \bm \mu_k, \bm \Sigma_k)
 	\end{myalign*}
 \end{itemize}
 
@@ -752,13 +761,14 @@ with $\bm \beta$ the parameters of the model.
 	\item \textit{[ALGORITHM]} Start with $\bm \theta^{(1)}$ and iterate
 	\begin{enumerate}
 		\item \textit{Expectation step}: Compute a lower bound to the cost such that it is tight at the previous $\bm \theta^{(i)}$
-
+		\begin{comment}
 		\begin{myalign*}
-		    \log \sum_{k = 1}^K \pi_k \N(\*x_n | \bm \mu_k, \bm \Sigma_k) \geq \sum_{k = 1}^K p_{kn} \log \frac{\pi_k \N(\*x_n | \bm \mu_k, \bm \Sigma_k)}{p_{kn}}
+		    \log \sum_{k = 1}^K \pi_k \N(\*x_n | \bm \mu_k, \bm \Sigma_k) \geq \sum_{k = 1}^K \gamma(r_{nk}) \log \frac{\pi_k \N(\*x_n | \bm \mu_k, \bm \Sigma_k)}{\gamma(r_{nk})}
 		\end{myalign*}
+		\end{comment}
 		with equality when,
 		\begin{myalign*}
-		    p_{kn} = \frac{\pi_k \N(\*x_n, \bm \Sigma_k)}{\sum_{k = 1}^K \pi_k \N(\*x_n | \bm \mu_k, \bm \Sigma_k)}
+		    \gamma(r_{nk}) = \frac{\pi_k \N(\*x_n| \bm \mu_k, \bm \Sigma_k)}{\sum_{k = 1}^K \pi_k \N(\*x_n | \bm \mu_k, \bm \Sigma_k)}
 		\end{myalign*}
 		\item \textit{Maximization step}: Update $\bm \theta$
 		\begin{myalign*}
@@ -766,15 +776,15 @@ with $\bm \beta$ the parameters of the model.
 		\end{myalign*}
 
 		\begin{myalign*}
-		    \bm \mu_k^{i + 1} = \frac{\sum_{n = 1}^N p_{kn}^{(i)} \*x_n}{\sum_{n = 1}^N p_{kn}^{(i)}}
+		    \bm \mu_k^{(i + 1)} = \frac{\sum_{n = 1}^N \gamma^{(i)}(r_{nk}) \*x_n}{\sum_{n = 1}^N \gamma^{(i)}(r_{nk})}
 		\end{myalign*}
 
 		\begin{myalign*}
-		    \bm\Sigma_k^{(i + 1)} = \frac{\sum_{n = 1}^N p_{kn}^{(i)} (\*x_n - \bm \mu_k^{(i + 1)})(\*x_n - \bm \mu_k^{(i + 1)})^T}{\sum_{n = 1}^N p_{kn}^{(i)}}
+		    \bm\Sigma_k^{(i + 1)} = \frac{\sum_{n = 1}^N \gamma^{(i)}(r_{nk}) (\*x_n - \bm \mu_k^{(i + 1)})(\*x_n - \bm \mu_k^{(i + 1)})^T}{\sum_{n = 1}^N \gamma^{(i)}(r_{nk})}
 		\end{myalign*}
 
 		\begin{myalign*}
-		    \pi_k^{(i + 1)} = \frac{1}{N} \sum_{n = 1}^N p_{kn}^{(i)}
+		    \pi_k^{(i + 1)} = \frac{1}{N} \sum_{n = 1}^N \gamma^{(i)}(r_{nk})
 		\end{myalign*}
 	\end{enumerate}
 	\item If the covariance is diagonal, then we have K-means.
@@ -797,7 +807,7 @@ with $\bm \beta$ the parameters of the model.
 	 \end{myalign*}
 	 \item We can add a regularizer and minimize the following cost:
 	 \begin{myalign*}
-	     \L(\*W, \*Z) = \frac{1}{2} \sum_{n = 1}^N \sum_{d = 1}^D (x_{dn} - \*w_d^T \*z_n)^2 + \frac{\lambda_w}{2} \sum_{d = 1}^D \*w_d^T\*w_d + \frac{\lambda_z}{2} \sum_{n = 1}^N \*z_n^T \*z_n
+	     \L(\*W, \*Z) = \frac{1}{2} \sum_{n = 1}^N \sum_{d = 1}^D (x_{dn} - \*w_d^T \*z_n)^2 \\ + \frac{\lambda_w}{2} \sum_{d = 1}^D \*w_d^T\*w_d + \frac{\lambda_z}{2} \sum_{n = 1}^N \*z_n^T \*z_n
 	 \end{myalign*}
 	 \item We can use coordinate descent algorithm, by first minimizing w.r.t. $\*Z$ given $\*W$ and then minimizing $\*W$ given $\*Z$. This is called \textbf{Alternating least-squares (ALS)}:
 	 \begin{myalign*}
@@ -808,7 +818,7 @@ with $\bm \beta$ the parameters of the model.
 	 \item Probabilistic model
 	 \begin{myalign*}
 	     \prod_{n = 1}^N \prod_{d \in O_n} \N(x_{dn} | \*w_d^T \*z_n, I) 
-	     \times \prod_{n = 1}^N \N(\*z_n | 0, \frac{1}{\lambda_z} I) 
+	     \times \prod_{n = 1}^N \N(\*z_n | 0, \frac{1}{\lambda_z} I) \\
 	     \times \prod_{d = 1}^D \N(\*w_d | 0, \frac{1}{\lambda_w} I)
 	 \end{myalign*}
 
@@ -833,7 +843,7 @@ with $\bm \beta$ the parameters of the model.
 	\end{itemize}
 	\item Assuming $D < N$ we have
 	\begin{myalign*}
-	    \*X = \sum_{d = i}^D s_d \*u_d \*v_d^T
+	    \*X = \sum_{d = 1}^D s_d \*u_d \*v_d^T
 	\end{myalign*}
 	This tells you about the spectrum of $\*X$ where higher singular vectors contain the \textit{low-frequency information} and lower singular values contain the \textit{high-frequency information}.
     \item Let's now truncate these matrices
@@ -855,7 +865,7 @@ with $\bm \beta$ the parameters of the model.
 such that columns of $\*W$ are orthogonal.
 \item If the data is zero mean
 \begin{myalign*}
-    \*C = \frac{1}{N} \*X \*X^T &\Rightarrow \*X \*X^T = \*U \*S^2 \*U^T \\
+    \*\Sigma = \frac{1}{N} \*X \*X^T &\Rightarrow \*X \*X^T = \*U \*S^2 \*U^T \\
     \Rightarrow \*U^T \*X \*X^T \*U &= \*U^T \*U \*S^2 \*U^T \*U = \*S^2\\
 \end{myalign*}
 \item Thus the columns of matrix $\*U$ are called the \textbf{principal components} and they decorrelate the covariance matrix.

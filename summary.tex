@@ -27,7 +27,7 @@
 
 \subsection{Convexity}
 \begin{itemize}
-\item A function is convex when a line joining two points never interects with the function anywhere else.
+\item A function is convex when a line joining two points never interects anywhere else.
 
 \item A function $f(x)$ is convex, if for any $x_1, x_2 \in \* X$ and for any $0 \leq \lambda \leq 1$, we have :
 $$ f(\lambda x_1 + (1 - \lambda) x_2) \leq \lambda f(x_1) + (1 - \lambda) f(x_2)$$
@@ -38,14 +38,12 @@ $$ f(\lambda x_1 + (1 - \lambda) x_2) \leq \lambda f(x_1) + (1 - \lambda) f(x_2)
 
 \item Sums of convex functions are also convex.
 
-\item The Hessian is related to the convexity of a function: a twice differentiable function is convex if and only if the Hessian is positive definite.
+\item The Hessian is related to the convexity: a twice differentiable function is convex i-o-if the Hessian is positive definite.
 \item The Hessian of a convex function is positive semi-definite and for a strictly-convex function it is positive definite.
-\item The Hessian matrix of a function
-\begin{align*}
-    \*H_{i,j} = \frac{d^2 f}{d x_i dx_j}
-\end{align*}
+\begin{myalign*}
+      \*H_{i,j} = d^2 f /d x_i dx_j
+ \end{myalign*}
 \end{itemize}
-
 % ========================================================
 
 \subsection{Linear Algebra}
@@ -58,7 +56,7 @@ $$ f(\lambda x_1 + (1 - \lambda) x_2) \leq \lambda f(x_1) + (1 - \lambda) f(x_2)
 
 \item $(\*A \*B)^T = \*B^T \*A^T$
 
-\item \textbf{Condition number} of a function measures how much the output value can change for a small change in the input argument. A matrix with a high condition number is said to be \textbf{ill-conditioned}. If $\*A$ is normal ($A^T A = A A^T$) then
+\item \textbf{Condition number} of a function measures how much the output value can change for a small change in the input. A matrix with a high condition number is said to be \textbf{ill-conditioned}. If $\*A$ is normal ($A^T A = A A^T$) then
 \begin{myalign*}
     k(\*A) = 
     \left|
@@ -72,13 +70,9 @@ $$ f(\lambda x_1 + (1 - \lambda) x_2) \leq \lambda f(x_1) + (1 - \lambda) f(x_2)
     \*a^T \*V \*a \geq 0
 \end{myalign*}
 for any real $N \times 1$ vector $a$.
-\item The real symmetric $N \times N$ matrix $\*V$ is said to be \textbf{positive definite} if 
-\begin{myalign*}
-    \*a^T \*V \*a > 0
-\end{myalign*}
-for any real $N \times 1$ vector $a$.
+\item \textbf{positive definite} if $\*a^T \*V \*a > 0$
 \item Cost of matrix inversion: $O(n^3) \rightarrow O(n^{2.372})$
-\item Cost of determinant computation using LU decomposition: $O(n^3)$
+\item $det(\*A)$ using LU decomposition: $O(n^3)$
 
 \end{itemize}
 
@@ -129,7 +123,7 @@ for any real $N \times 1$ vector $a$.
         \end{array}
     \right.
 \end{myalign*}
-Tukey's loss is non-convex, non-differentiable, but robust to outliers.
+Non-convex, non-diff., but robust to outliers.
 
 
 \textbf{Hinge loss}
@@ -728,7 +722,7 @@ with $\bm \beta$ the parameters of the model.
 	\item Unknown parameters are given by $ \bm \theta = \{\bm \mu, \bm \Sigma, \bm \pi\}$
 	\item We get the \textbf{marginal likelihood} by marginalizing $r_n$ out from the likelihood
 	\begin{myalign*}
-	    p(\*x_n | \bm \theta) & = \sum_{k = 1}^K p(\*x_n, r_{nk} = 1 | \bm \theta)\\
+	    p(\*x_n | \bm \theta) &= \sum_{k = 1}^K p(\*x_n, r_{nk} = 1 | \bm \theta)\\
 	    &= \sum_{k = 1}^K p(r_{nk} = 1 | \bm \theta) p(\*x_n | r_{nk} = 1, \bm \theta)\\
 	    &= \sum_{k = 1}^K \pi_k \N(\*x_n | \bm \mu_k, \bm \Sigma_k)
 	\end{myalign*}
@@ -775,7 +769,7 @@ with $\bm \beta$ the parameters of the model.
 		    \pi_k^{(i + 1)} = \frac{1}{N} \sum_{n = 1}^N \gamma^{(i)}(r_{nk})
 		\end{myalign*}
 	\end{enumerate}
-	\item If the covariance is diagonal, then we have K-means.
+	\item If covariance is diagonal $\rightarrow$ K-means.
 \end{itemize}
 
 % ========================================================
@@ -836,8 +830,8 @@ with $\bm \beta$ the parameters of the model.
 	This tells you about the spectrum of $\*X$ where higher singular vectors contain the \textit{low-frequency information} and lower singular values contain the \textit{high-frequency information}.
     \item Let's now truncate these matrices
     \begin{align*}
-        \*X &\approx \*U_{tr} \*S_{tr} \*V^*_{tr} \\
-        \*T_{tr} &\approx \*U_{tr} \*S_{tr}, \*T_{te} &\approx \*X_{te}\*V_{tr}
+        \*X \approx \*U_{tr} \*S_{tr} \*V^*_{tr}, 
+        \*T_{tr} \approx \*U_{tr} \*S_{tr}, \*T_{te} \approx \*X_{te}\*V_{tr}
     \end{align*}
     with $\*T_{tr}$ the reduced feature set of $\*X$ and $\*T_{te}$ the reduced feature set of $\*X_{te}$
 \end{itemize}
@@ -869,7 +863,18 @@ such that columns of $\*W$ are orthogonal.
     \begin{align*}
         p_{\theta}(\*x) = \prod_{k = 1}^K p_{\theta}(x_k | \text{parents}_k)
     \end{align*}
-    \item We can reduce the complexity by using the structure of the problem and the bayesian rule. %LEARN
+    \item Reduce complexity using bayesian rule. %LEARN
+    \item Message Passing:
+    \begin{enumerate}
+    	\item Assign each $\phi_k$ to a cluster $\*C_i$
+    	\item Initial potential $\psi_i (\*C_i) = \prod_{\phi_k \in \*C_i} \phi_k $
+    	\item Initial all messages to 1
+    	\item Repeat: select and edge $(i,j)$ and:
+    \end{enumerate}
+    \begin{myalign*}
+        m_{i \rightarrow j}(\* S_{i,j}) = \sum_{\*C_i - \* S_{i,j}} \psi_i \times \prod_{k \in (\N_i - {j})} m_{k \rightarrow i}
+    \end{myalign*}
+    \item Belief: $\beta_i(\*C_i) = \psi_i \times \prod_{k \in \N_i} \delta_{k \rightarrow i}$
 \end{itemize}
 
 % ========================================================
@@ -901,13 +906,16 @@ such that columns of $\*W$ are orthogonal.
     \begin{myalign*}
         g(a) = \tanh(a) = \frac{e^a - e^{-a}}{e^a + e^{-a}}
     \end{myalign*}
-    \item \textbf{Backpropagation} is a technic to compute the gradient in time linear in the number of training points and the number of weights and is nothing else than a chain rule of differential calculus.
+    \item \textbf{Backpropagation}: technic to compute the gradient in time linear in the number of training points and the number of weights and is nothing else than a chain rule of differential calculus.
     \item The key-idea is to express the derivatives in terms of activations and hidden variables.
     \begin{enumerate}
     	\item \textbf{Forward}: compute $\*a_n^{(k)}$ and $\*z_n^{(k)}$
     	\item \textbf{Backward}: compute $\bm \delta_n^{(k)} = d \bm \L / d \*a_n^{(k)}$ using 
     	\begin{myalign*}
-    	    \bm \delta^{(k - 1)}_n = diag[(\*h' (a_n^{(k)})] (\*B^{(k)})^T \bm \delta_n^{(k)}
+    	    \bm \delta^{(k - 1)}_n = diag[(h' (\*a_n^{(k-1)})] (\*B^{(k)})^T \bm \delta_n^{(k)}
+    	\end{myalign*}
+    	\begin{myalign*}
+    	    \bm \delta_n^{K} = \* a_n^{K} - t_i
     	\end{myalign*}
     	\item Compute $d \bm \L / d \*B^{(k)}$ using 
     	\begin{myalign*}
